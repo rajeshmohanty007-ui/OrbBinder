@@ -1,0 +1,208 @@
+{
+    "core": {
+        "pyro": {
+            "element": "fire",
+            "damage": 200,
+            "effect": [
+                {"type": "burn", "value": 10, "duration": 3}
+            ],
+            "cost": 6
+        },
+        "blaze": {
+            "element": "fire",
+            "damage": 220,
+            "effect": [
+                {"type": "attack_down", "value": 20}
+            ],
+            "cost": 8
+        },
+        "magma": {
+            "element": "fire",
+            "damage": 250,
+            "effect": [
+                {"type": "burn", "value": 10, "duration": 3}
+            ],
+            "cost": 12
+        },
+        "flood": {
+            "element": "water",
+            "damage": 180,
+            "effect": [
+                {"type": "spGain", "value": 20}
+            ],
+            "cost": 5
+        },
+        "aqua": {
+            "element": "water",
+            "damage": 210,
+            "effect": [
+                {"type": "spGain", "value": 40}
+            ],
+            "cost": 9
+        },
+        "hydro": {
+            "element": "water",
+            "damage": 260,
+            "effect": [
+                {"type": "heal", "value": 50}
+            ],
+            "cost": 12
+        },
+        "gale": {
+            "element": "wind",
+            "damage": 150,
+            "effect": [
+                {"type": "break_shield", "value": 20}
+            ],
+            "cost": 6
+        },
+        "cyclone": {
+            "element": "wind",
+            "damage": 200,
+            "effect": [
+                {"type": "attack_down", "value": 20}
+            ],
+            "cost": 9
+        },
+        "tornado": {
+            "element": "wind",
+            "damage": 230,
+            "effect": [
+                {"type": "break_shield", "value": 20}
+            ],
+            "cost": 12
+        },
+        "litho": {
+            "element": "earth",
+            "damage": 200,
+            "effect": [
+                {"type": "poison", "value": 12, "duration": 3}
+            ],
+            "cost": 6
+        },
+        "stone": {
+            "element": "earth",
+            "damage": 230,
+            "effect": [
+                {"type": "attack_down", "value": 20}
+            ],
+            "cost": 9
+        },
+        "flora": {
+            "element": "earth",
+            "damage": 260,
+            "effect": [
+                {"type": "heal", "value": 100}
+            ],
+            "cost": 12
+        }
+    },
+    "particle": {
+        "amber": {
+            "element": "fire",
+            "el_damage": 20,
+            "damage": 10,
+            "cost": 3
+        },
+        "cinder": {
+            "element": "fire",
+            "damage": 10,
+            "effect": [
+                {"type": "attack_up", "value": 10}
+            ],
+            "cost": 2
+        },
+        "ash": {
+            "element": "fire",
+            "damage": 5,
+            "effect": [
+                {"type": "attack_down", "value": 20}
+            ],
+            "cost": 2
+        },
+        "waves": {
+            "element": "water",
+            "damage": 10,
+            "effect": [
+                {"type": "remove", "value": "burn"}
+            ],
+            "cost": 3
+        },
+        "foam": {
+            "element": "fire",
+            "el_damage": 30,
+            "damage": 5,
+            "cost": 2
+        },
+        "rain": {
+            "element": "water",
+            "damage": 10,
+            "effect": [
+                {"type": "remove", "value": "burn"},
+                {"type": "attack_down", "value": 20}
+            ],
+            "cost": 3
+        },
+        "zephyr": {
+            "element": "wind",
+            "damage": 10,
+            "effect": [
+                {"type": "remove", "value": "poison"}
+            ],
+            "cost": 2
+        },
+        "gust": {
+            "element": "wind",
+            "damage": 10,
+            "effect": [
+                {"type": "remove", "value": "poison"},
+                {"type": "attack_down", "value": 20}
+            ],
+            "cost": 2
+        },
+        "draft": {
+            "element": "wind",
+            "damage": 20,
+            "cost": 3
+        },
+        "leaves": {
+            "element": "earth",
+            "damage": 5,
+            "effect": [
+                {"type": "heal", "value": 100}
+            ],
+            "cost": 2
+        },
+        "sand": {
+            "element": "earth",
+            "damage": 5,
+            "effect": [
+                {"type": "ignore", "value": "shield"},
+                {"type": "attack_down", "value": 20}
+            ],
+            "cost": 3
+        },
+        "fossil": {
+            "element": "earth",
+            "damage": 10,
+            "effect": [
+                {"type": "poison", "value": 12, "duration": 3}
+            ],
+            "cost": 3
+        }
+    },
+    "rings": {
+        "yellow": {
+            "damage": 30,
+            "cost": 2
+        },
+        "purple": {
+            "damage": 50,
+            "cost": 3
+        },
+        "black": {
+            "damage": 60,
+            "cost": 4
+        }
+    }
+}

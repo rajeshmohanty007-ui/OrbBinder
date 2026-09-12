@@ -112,10 +112,6 @@ export default class uiScene extends Phaser.Scene {
             });
         });
 
-        BeamScene.events.on('enemy-damaged', (enemy) => {
-            this.EhpBar.setHP(enemy.health);
-            this.EspBar.setSP(enemy.shield);
-        })
         BeamScene.events.on('scene-over', (coins) => {
             this.coinCount = coins;
             this.coinText.setText(this.coinCount)

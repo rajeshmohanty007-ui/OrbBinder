@@ -1,23 +1,13 @@
 import Phaser from "phaser";
 import Calc from "../../data/logics/damageCalculator";
 import status from "../../data/logics/status";
+import { coinMapping } from "../../data/coinMapping";
+import { delay } from "../../utils/delay";
+import { registerBeamAnimations } from "../../Animations/BeamAnimation";
+import SelectionSystem from "../../systems/SelectionSytem";
+import { loadData } from "../../data/coinMapping";
+import Shop from "../../components/Shop";
 
-let D = null;
-async function loadData() {
-    if (!D) {
-        const res = await fetch('/src/data/db.json');
-        D = await res.json();
-    }
-    return D;
-}
-async function coinMapping() {
-    const data = await loadData();
-    const coinMap1 = Object.fromEntries(Object.keys(data.core).map(core => [core, data.core[core].cost]));
-    const coinMap2 = Object.fromEntries(Object.keys(data.particle).map(par => [par, data.particle[par].cost]));
-    const coinMap3 = Object.fromEntries(Object.keys(data.rings).map(ring => [ring, data.rings[ring].cost]));
-    let coinMap = { ...coinMap1, ...coinMap2, ...coinMap3 };
-    return coinMap;
-}
 
 export default class BeamScene extends Phaser.Scene {
     constructor() {
@@ -26,6 +16,7 @@ export default class BeamScene extends Phaser.Scene {
 
     preload() {
         this.load.spritesheet('ringUI', '/src/assets/UI/Rings.png', { frameWidth: 64, frameHeight: 64 });
+        this.load.image('highlighter', '/src/assets/UI/highlighter.png');
         this.load.spritesheet('pyroSrt', '/src/assets/sprites/pyroStart.png', { frameWidth: 64, frameHeight: 64 });
         this.load.spritesheet('pyroMid', '/src/assets/sprites/pyroMid.png', { frameWidth: 64, frameHeight: 64 });
         this.load.spritesheet('pyroEnd', '/src/assets/sprites/pyroEnd.png', { frameWidth: 64, frameHeight: 64 });
@@ -34,33 +25,8 @@ export default class BeamScene extends Phaser.Scene {
         this.load.atlas('beamSheet', '/src/assets/UI/beamSheet.png', '/src/assets/UI/beamSheet.json');
     }
     async coinLoad() {
+        this.data = await loadData();
         this.coinMap = await coinMapping();
-    }
-    animations() {
-        this.anims.create({
-            key: 'startBeam1-init',
-            frames: this.anims.generateFrameNumbers('pyroSrt', { start: 0, end: 1 }),
-            frameRate: 2,
-            repeat: 0
-        });
-        this.anims.create({
-            key: 'startBeam1-rep',
-            frames: this.anims.generateFrameNumbers('pyroSrt', { start: 2, end: 5 }),
-            frameRate: 6,
-            repeat: -1
-        })
-        this.anims.create({
-            key: 'midBeam1',
-            frames: this.anims.generateFrameNumbers('pyroMid', { start: 0, end: 5 }),
-            frameRate: 6,
-            repeat: -1
-        })
-        this.anims.create({
-            key: 'endBeam1',
-            frames: this.anims.generateFrameNumbers('pyroEnd', { start: 0, end: 3 }),
-            frameRate: 6,
-            repeat: -1
-        })
     }
     refresh(part, i) {
         const l = this.scale.width;
@@ -74,7 +40,7 @@ export default class BeamScene extends Phaser.Scene {
             el.setDisplaySize(l * 0.05, l * 0.05);
             el.setInteractive({ useHandCursor: true });
             el.on('pointerdown', () => {
-                (i === 0) ? this.selectCore(name, el) : this.selectParticle(name, el);
+                (i === 0) ? this.selectionSystem.selectCore(name, el) : this.selectionSystem.selectParticle(name, el);
             })
             this.parts[i].add(el);
         }
@@ -94,56 +60,6 @@ export default class BeamScene extends Phaser.Scene {
         this.time.delayedCall(2000, () => {
             msg.destroy();
         })
-    }
-    selectCore(name, el) {
-        if (this.beam.core) this.errorMessage();
-        else if (this.coinMap[name] >= this.coinCount) {
-            this.aukatMessage();
-        }
-        else {
-            this.coinCount -= this.coinMap[name];
-            this.coreContainer.remove(el);
-            el.setPosition(45, 15);
-            el.setScale(0.9);
-            this.midContainer.add(el);
-            this.beam.core = name;
-            this.events.emit('core_selected', this.coinCount);
-        }
-    }
-    selectParticle(name, el) {
-        if (this.beam.particle) this.errorMessage();
-        else if (this.coinMap[name] >= this.coinCount) {
-            this.aukatMessage();
-        }
-        else {
-            this.coinCount -= this.coinMap[name];
-            this.particleContainer.remove(el);
-            el.setPosition(16, 71);
-            el.setScale(0.9);
-            this.midContainer.add(el);
-            this.beam.particle = name;
-            this.events.emit('particle_selected', this.coinCount);
-        }
-    }
-    selectRing(name, el) {
-        if (this.beam.ring) this.errorMessage();
-        else if (this.coinMap[name] >= this.coinCount) {
-            this.aukatMessage();
-        }
-        else {
-            this.coinCount -= this.coinMap[name];
-            this.ringContainer.remove(el);
-            el.setPosition(76, 72);
-            el.setScale(0.9);
-            this.midContainer.add(el);
-            this.beam.ring = name;
-            this.events.emit('ring_selected', this.coinCount);
-        }
-    }
-    delay(ms) {
-        return new Promise(resolve => {
-            this.time.delayedCall(ms, resolve);
-        });
     }
     clearBeam() {
         Object.keys(this.beam).forEach(key => this.beam[key] = null);
@@ -183,7 +99,7 @@ export default class BeamScene extends Phaser.Scene {
         beamS.play('startBeam1-init');
         beamContainer.add(beamS);
 
-        await this.delay(1000);
+        await delay(1000);
         beamS.play('startBeam1-rep');
         for (let i = 0; i < 20; i++) {
             const el = this.add.sprite(beamS.x + 32 * (i + 1), beamS.y, 'pyroMid');
@@ -200,7 +116,7 @@ export default class BeamScene extends Phaser.Scene {
 
         await this.damageHandler();
 
-        await this.delay(4000);
+        await delay(4000);
         beamContainer.destroy(true);
         this.clearBeam()
 
@@ -221,7 +137,10 @@ export default class BeamScene extends Phaser.Scene {
         this.particles = ["amber", "cinder", "ash", "waves", "foam", "rain", "zephyr", "gust", "draft", "leaves", "sand", "fossil"];
         this.rings = ["yellow", "purple", "black"];
 
-        if (!this.anims.exists('startBeam1-init')) this.animations();
+        this.selectionSystem = new SelectionSystem(this);
+        this.shop = new Shop(this);
+
+        if (!this.anims.exists('startBeam1-init')) registerBeamAnimations(this);
         const l = this.scale.width;
         const h = this.scale.height;
 
@@ -304,7 +223,7 @@ export default class BeamScene extends Phaser.Scene {
             el.setDisplaySize(l * 0.05, l * 0.05);
             el.setInteractive({ useHandCursor: true });
             el.on('pointerdown', () => {
-                this.selectRing(this.rings[i], el);
+                this.selectionSystem.selectRing(this.rings[i], el);
             })
             this.ringContainer.add(el);
         }

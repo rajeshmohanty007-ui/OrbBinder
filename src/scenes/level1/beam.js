@@ -67,6 +67,7 @@ export default class BeamScene extends Phaser.Scene {
         this.midContainer.removeAll(true);
         this.refresh(this.cores, 0);
         this.refresh(this.particles, 1);
+        this.shop.hideShop();
     }
     async damageHandler() {
         let damage = await Calc(this.beam.core, this.beam.particle, this.beam.ring);
@@ -176,9 +177,6 @@ export default class BeamScene extends Phaser.Scene {
         };
         // initiating Booleans
         this.enemyDead = true;
-        this.coreSelected = false;
-        this.particleSelected = false;
-        this.ringSelected = false;
         this.beamAnimationRunning = false;
 
         // Beam maker logic

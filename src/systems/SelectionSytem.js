@@ -14,6 +14,7 @@ export default class selectionSystem {
         this.showHighLighter(name, el, this.scene.ringContainer);
     }
     showHighLighter(name, el, container) {
+        if (Object.values(this.scene.beam).includes(name)) return;
         if (this.highLighter) this.highLighter.destroy();
         this.highLighter = this.scene.add.image(el.x, el.y, 'highlighter');
         this.highLighter.setDisplaySize(48, 48);

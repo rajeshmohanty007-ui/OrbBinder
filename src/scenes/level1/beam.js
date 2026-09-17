@@ -7,6 +7,9 @@ import { registerBeamAnimations } from "../../Animations/BeamAnimation";
 import SelectionSystem from "../../systems/SelectionSytem";
 import { loadData } from "../../data/coinMapping";
 import Shop from "../../components/Shop";
+import PartRender from "../../systems/partRender";
+import MessageSystem from "../../utils/MessegeSystem";
+import TextBubbleVfx from "../../vfx/TextBubbleVfx";
 
 
 export default class BeamScene extends Phaser.Scene {
@@ -23,50 +26,19 @@ export default class BeamScene extends Phaser.Scene {
         this.load.image('beamMaker', '/src/assets/UI/BeamMaker.png');
         this.load.image('refreshBtn', '/src/assets/UI/RefreshBtn.png');
         this.load.atlas('beamSheet', '/src/assets/UI/beamSheet.png', '/src/assets/UI/beamSheet.json');
+        this.load.json('db', '/src/data/db.json');
     }
     async coinLoad() {
-        this.data = await loadData();
         this.coinMap = await coinMapping();
     }
-    refresh(part, i) {
-        const l = this.scale.width;
-        const h = this.scale.height;
-        this.parts[i].removeAll(true);
-        for (let j = 0; j < 4; j++) {
-            const n = Math.floor(Math.random() * 12);
-            const name = part[n];
-            const el = this.add.image(j * l * 0.05, 0, 'beamSheet', name);
-            el.setOrigin(0, 0);
-            el.setDisplaySize(l * 0.05, l * 0.05);
-            el.setInteractive({ useHandCursor: true });
-            el.on('pointerdown', () => {
-                (i === 0) ? this.selectionSystem.selectCore(name, el) : this.selectionSystem.selectParticle(name, el);
-            })
-            this.parts[i].add(el);
-        }
-    }
-    errorMessage() {
-        const msg = this.add.text(this.scale.width / 2, this.scale.height / 2, 'One item for this section is selected already', { color: '#ffffff' });
-        msg.setOrigin(0.5);
-        msg.setScale(2);
-        this.time.delayedCall(2000, () => {
-            msg.destroy();
-        })
-    }
-    aukatMessage() {
-        const msg = this.add.text(this.scale.width / 2, this.scale.height / 2, "You don't have sufficient currency", { color: '#f45369' });
-        msg.setOrigin(0.5);
-        msg.setScale(2);
-        this.time.delayedCall(2000, () => {
-            msg.destroy();
-        })
-    }
+
     clearBeam() {
         Object.keys(this.beam).forEach(key => this.beam[key] = null);
         this.beamAnimationRunning = false;
         this.midContainer.removeAll(true);
-        this.refresh(this.cores, 0);
-        this.refresh(this.particles, 1);
+        this.partRender.refreshCore(this.cores);
+        this.partRender.refreshParticle(this.particles);
+        this.partRender.refreshRing();
         this.shop.hideShop();
     }
     async damageHandler() {
@@ -134,12 +106,16 @@ export default class BeamScene extends Phaser.Scene {
 
     }
     create() {
+        this.data = this.cache.json.get('db');
         this.cores = ["pyro", "blaze", "magma", "litho", "stone", "flora", "gale", "cyclone", "tornado", "flood", "aqua", "hydro"];
         this.particles = ["amber", "cinder", "ash", "waves", "foam", "rain", "zephyr", "gust", "draft", "leaves", "sand", "fossil"];
         this.rings = ["yellow", "purple", "black"];
 
         this.selectionSystem = new SelectionSystem(this);
+        this.partRender = new PartRender(this);
         this.shop = new Shop(this);
+        this.messageSystem = new MessageSystem(this);
+        this.textBubbleVfx = new TextBubbleVfx(this);
 
         if (!this.anims.exists('startBeam1-init')) registerBeamAnimations(this);
         const l = this.scale.width;
@@ -198,14 +174,14 @@ export default class BeamScene extends Phaser.Scene {
         const refreshParticle = this.add.image(0, l * 0.05, 'refreshBtn');
         refreshParticle.setOrigin(0, 0);
         refreshParticle.setDisplaySize(l * 0.05, l * 0.05);
-        for (let i = 0; i < 2; i++) {
-            const el = (i === 0) ? refreshCore : refreshParticle;
-            const part = (i === 0) ? this.cores : this.particles;
-            el.setInteractive({ useHandCursor: true });
-            el.on('pointerdown', () => {
-                this.refresh(part, i);
-            })
-        }
+        refreshCore.setInteractive({ useHandCursor: true });
+        refreshCore.on('pointerdown', () => {
+            this.partRender.refreshCore(this.cores);
+        })
+        refreshParticle.setInteractive({ useHandCursor: true });
+        refreshParticle.on('pointerdown', () => {
+            this.partRender.refreshParticle(this.particles);
+        })
         this.refreshBtn.add([refreshCore, refreshParticle]);
 
         // Adding UI elements
@@ -213,18 +189,9 @@ export default class BeamScene extends Phaser.Scene {
         this.particleContainer = this.add.container(l * 0.4, h * 0.65 + l * 0.05);
         this.ringContainer = this.add.container(l * 0.4, h * 0.65 + l * 0.1);
         this.parts = [this.coreContainer, this.particleContainer, this.ringContainer];
-        this.refresh(this.cores, 0);
-        this.refresh(this.particles, 1);
-        for (let i = 0; i < 3; i++) {
-            const el = this.add.image(i * l * 0.05, 0, 'ringUI', i);
-            el.setOrigin(0, 0);
-            el.setDisplaySize(l * 0.05, l * 0.05);
-            el.setInteractive({ useHandCursor: true });
-            el.on('pointerdown', () => {
-                this.selectionSystem.selectRing(this.rings[i], el);
-            })
-            this.ringContainer.add(el);
-        }
+        this.partRender.refreshCore(this.cores);
+        this.partRender.refreshParticle(this.particles);
+        this.partRender.refreshRing();
 
     }
     update() {

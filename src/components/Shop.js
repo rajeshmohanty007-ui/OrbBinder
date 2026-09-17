@@ -12,11 +12,11 @@ export default class Shop {
         this.shopElement.setOrigin(0, 0);
         this.shopElement.setScale(2);
 
-        this.name = this.scene.add.text(132, 16, '');
+        this.name = this.scene.add.text(132, 16, '', { color: "#7ee326ff", backgroundColor: "#000000", padding: { x: 10, y: 5 } });
 
-        this.damageLabel = this.scene.add.text(132, 48, 'Damage', { color: '#eece2eff' });
+        this.damageLabel = this.scene.add.text(132, 48, 'Damage', { color: '#eece2eff', backgroundColor: "#000000", padding: { x: 10, y: 5 } });
 
-        this.damageValue = this.scene.add.text(200, 48, '', { color: '#eece2eff' });
+        this.damageValue = this.scene.add.text(200, 48, '', { color: '#eece2eff', backgroundColor: "#000000", padding: { x: 10, y: 5 } });
 
         this.buyBtn = this.scene.add.rectangle(
             132, 96, 100, 40, 0x1d5f00
@@ -50,6 +50,12 @@ export default class Shop {
         ]);
     }
     update(name, el) {
+        const elementColor = {
+            fire: "#ff4400ff",
+            earth: "#eeee09ff",
+            water: "#14cfefff",
+            wind: "#f7f6e7ff"
+        }
         this.selectedItem = el;
         this.container.setVisible(true);
 
@@ -69,6 +75,7 @@ export default class Shop {
         );
 
         this.name.setText(name);
+        this.name.setColor(elementColor[currentElement.element] || "#ffffffff");
         this.damageValue.setText(currentElement.damage);
         this.costText.setText(currentElement.cost);
 
@@ -88,15 +95,18 @@ export default class Shop {
             ring: [76, 72]
         }
         if (this.scene.beam[type]) {
-            this.scene.errorMessage();
+            this.scene.textBubbleVfx.showText("Already Selected " + type, 790, 454, 1000, "arial", "32px", null, "#ff0000");
             return;
         }
         else if (this.scene.coinMap[name] >= this.scene.coinCount) {
-            this.scene.aukatMessage();
+            this.scene.textBubbleVfx.showText("Not Enough Money", 790, 454, 1000, "arial", "32px", null, "#ff0000");
             return;
         }
         else {
-            this.scene.coinCount -= this.scene.coinMap[name];
+            const cost = this.scene.coinMap[name];
+            this.scene.coinCount -= cost;
+            this.scene.textBubbleVfx.showText(`-${cost}`, 658 + 132, 358 + 96, 1000, "Fantasy", "32px", null, "#ef2828ff");
+            this.scene.textBubbleVfx.BreatheStop(el);
             containerHelper[type].remove(el);
             el.setPosition(posHelper[type][0], posHelper[type][1]);
             el.setScale(0.9);

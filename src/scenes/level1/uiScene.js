@@ -13,8 +13,6 @@ export default class uiScene extends Phaser.Scene {
         this.load.spritesheet('pauseCoin', '/src/assets/UI/pauseCoin.png', { frameWidth: 32, frameHeight: 32 });
     }
     create() {
-        const l = this.scale.width;
-        const h = this.scale.height;
         const BeamScene = this.scene.get('BeamScene');
 
         //Status
@@ -38,9 +36,9 @@ export default class uiScene extends Phaser.Scene {
         this.sptext = this.add.text(50, 135, "SP: 100").setOrigin(0, 0).setScrollFactor(0);
 
         // Pause Button
-        this.pause = this.add.image(l * 0.04, l * 0.04, 'pauseCoin', 0);
+        this.pause = this.add.image(38.4, 38.4, 'pauseCoin', 0);
         this.pause.setScrollFactor(0);
-        this.pause.setDisplaySize(l * 0.04, l * 0.04);
+        this.pause.setDisplaySize(38.4, 38.4);
         this.pause.setInteractive({ useHandCursor: true });
         this.pause.on('pointerdown', () => {
             this.scene.pause('InitialGameScene');

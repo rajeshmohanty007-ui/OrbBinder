@@ -77,18 +77,15 @@ export default class Level2Scene extends Phaser.Scene {
     }
 
     create() {
-        const l = this.scale.width;
-        const b = this.scale.height;
-
         this.animations();
 
         // 1. Level Design Background
         // Since the world is 2880px wide (60 columns * 48px), tile background horizontally 3 times
         this.bgs = this.add.group();
         for (let i = 0; i < 3; i++) {
-            const bgImg = this.add.image(i * l, 0, 'bg');
+            const bgImg = this.add.image(i * 960, 0, 'bg');
             bgImg.setOrigin(0, 0);
-            bgImg.setDisplaySize(l, b);
+            bgImg.setDisplaySize(960, 540);
         }
 
         // 2. Physics Groups for Tilemap
@@ -222,8 +219,8 @@ export default class Level2Scene extends Phaser.Scene {
         this.hudContainer.add(hudTitle);
 
         // Back button to level select
-        const backBtn = this.add.image(l - 50, 40, 'back');
-        backBtn.setDisplaySize(l * 0.04, b * 0.08);
+        const backBtn = this.add.image(910, 40, 'back');
+        backBtn.setDisplaySize(38.4, 43.2);
         backBtn.setOrigin(0.5);
         backBtn.setInteractive({ useHandCursor: true });
         backBtn.on('pointerdown', () => {
@@ -233,8 +230,8 @@ export default class Level2Scene extends Phaser.Scene {
 
         // 10. Pause Menu (Triggered with ESC key)
         this.isPaused = false;
-        this.pauseContainer = this.add.container(l / 2, b / 2).setScrollFactor(0).setVisible(false);
-        const pauseBG = this.add.rectangle(0, 0, l, b, 0x000000, 0.6);
+        this.pauseContainer = this.add.container(480, 270).setScrollFactor(0).setVisible(false);
+        const pauseBG = this.add.rectangle(0, 0, 960, 540, 0x000000, 0.6);
         const pauseText = this.add.text(0, -50, 'GAME PAUSED', {
             fontFamily: 'Arial',
             fontSize: '36px',
@@ -311,14 +308,14 @@ export default class Level2Scene extends Phaser.Scene {
         this.physics.pause();
         this.levelCompleted = true;
 
-        const gameOverText = this.add.text(this.scale.width / 2, this.scale.height / 2 - 50, 'GAME OVER', {
+        const gameOverText = this.add.text(480, 220, 'GAME OVER', {
             fontFamily: 'Arial',
             fontSize: '48px',
             fontWeight: 'bold',
             color: '#ff3333'
         }).setOrigin(0.5).setScrollFactor(0);
 
-        const restartText = this.add.text(this.scale.width / 2, this.scale.height / 2 + 20, 'Click to Restart', {
+        const restartText = this.add.text(480, 290, 'Click to Restart', {
             fontFamily: 'Arial',
             fontSize: '22px',
             color: '#ffffff'
@@ -339,14 +336,14 @@ export default class Level2Scene extends Phaser.Scene {
         this.goalChest.setAlpha(0.6);
 
         // Success panel overlay
-        const clearText = this.add.text(this.scale.width / 2, this.scale.height / 2 - 50, 'LEVEL COMPLETED!', {
+        const clearText = this.add.text(480, 220, 'LEVEL COMPLETED!', {
             fontFamily: 'Arial',
             fontSize: '48px',
             fontWeight: 'bold',
             color: '#ffd700'
         }).setOrigin(0.5).setScrollFactor(0);
 
-        const nextText = this.add.text(this.scale.width / 2, this.scale.height / 2 + 20, 'Return to Level Menu', {
+        const nextText = this.add.text(480, 290, 'Return to Level Menu', {
             fontFamily: 'Arial',
             fontSize: '22px',
             color: '#ffffff'

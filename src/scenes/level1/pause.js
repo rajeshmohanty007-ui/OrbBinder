@@ -8,17 +8,14 @@ export default class PauseScene extends Phaser.Scene {
         this.load.image('resume2', '/src/assets/UI/forW.png');
     }
     create() {
-        const l = this.scale.width;
-        const h = this.scale.height;
-
-        const shade = this.add.rectangle(l / 2, h / 2, 3 * l, h, 0x000000, 0.5);
+        const shade = this.add.rectangle(480, 270, 2880, 540, 0x000000, 0.5);
         this.pauseState = false;
         this.pauseMenu = this.add.container();
         this.pauseMenu.setScrollFactor(0);
-        const resume = this.add.image(l * 0.4, h * 0.5, 'resume2');
-        const exit = this.add.image(l * 0.6, h * 0.5, 'exit');
-        resume.setDisplaySize(l * 0.1, l * 0.1);
-        exit.setDisplaySize(l * 0.1, l * 0.1);
+        const resume = this.add.image(384, 270, 'resume2');
+        const exit = this.add.image(576, 270, 'exit');
+        resume.setDisplaySize(96, 96);
+        exit.setDisplaySize(96, 96);
         resume.setInteractive({ useHandCursor: true });
         exit.setInteractive({ useHandCursor: true });
         resume.setScrollFactor(0);

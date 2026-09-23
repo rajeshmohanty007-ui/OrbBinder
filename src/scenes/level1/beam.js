@@ -27,6 +27,7 @@ export default class BeamScene extends Phaser.Scene {
         this.load.image('refreshBtn', '/src/assets/UI/RefreshBtn.png');
         this.load.atlas('beamSheet', '/src/assets/UI/beamSheet.png', '/src/assets/UI/beamSheet.json');
         this.load.json('db', '/src/data/db.json');
+        this.load.spritesheet('AoE', '/src/assets/UI/AoE.png', { frameWidth: 64, frameHeight: 64 });
     }
     async coinLoad() {
         this.coinMap = await coinMapping();
@@ -118,8 +119,6 @@ export default class BeamScene extends Phaser.Scene {
         this.textBubbleVfx = new TextBubbleVfx(this);
 
         if (!this.anims.exists('startBeam1-init')) registerBeamAnimations(this);
-        const l = this.scale.width;
-        const h = this.scale.height;
 
         this.events.emit('enemy-arrived', {
             maxHP: 300,
@@ -156,24 +155,24 @@ export default class BeamScene extends Phaser.Scene {
         this.beamAnimationRunning = false;
 
         // Beam maker logic
-        this.beamMakerBG = this.add.rectangle(l * 0.01, h * 0.02, l * 0.13, l * 0.13, 0x000000, 1).setOrigin(0, 0);
+        this.beamMakerBG = this.add.rectangle(9.6, 10.8, 124.8, 124.8, 0x000000, 1).setOrigin(0, 0);
         this.beamMaker = this.add.image(0, 0, 'beamMaker');
-        this.beamMaker.setDisplaySize(l * 0.15, l * 0.15);
+        this.beamMaker.setDisplaySize(144, 144);
         this.beamMaker.setOrigin(0, 0);
-        this.beamMakerContainer = this.add.container(l * 0.1, h * 0.65);
+        this.beamMakerContainer = this.add.container(96, 351);
         this.midContainer = this.add.container(0, 0);
         this.beamMakerContainer.add(this.beamMakerBG);
         this.beamMakerContainer.add(this.midContainer);
         this.beamMakerContainer.add(this.beamMaker);
 
         // Adding Refresh Buttons
-        this.refreshBtn = this.add.container(l * 0.35, h * 0.65);
+        this.refreshBtn = this.add.container(336, 351);
         const refreshCore = this.add.image(0, 0, 'refreshBtn');
         refreshCore.setOrigin(0, 0);
-        refreshCore.setDisplaySize(l * 0.05, l * 0.05);
-        const refreshParticle = this.add.image(0, l * 0.05, 'refreshBtn');
+        refreshCore.setDisplaySize(48, 48);
+        const refreshParticle = this.add.image(0, 48, 'refreshBtn');
         refreshParticle.setOrigin(0, 0);
-        refreshParticle.setDisplaySize(l * 0.05, l * 0.05);
+        refreshParticle.setDisplaySize(48, 48);
         refreshCore.setInteractive({ useHandCursor: true });
         refreshCore.on('pointerdown', () => {
             this.partRender.refreshCore(this.cores);
@@ -185,9 +184,9 @@ export default class BeamScene extends Phaser.Scene {
         this.refreshBtn.add([refreshCore, refreshParticle]);
 
         // Adding UI elements
-        this.coreContainer = this.add.container(l * 0.4, h * 0.65);
-        this.particleContainer = this.add.container(l * 0.4, h * 0.65 + l * 0.05);
-        this.ringContainer = this.add.container(l * 0.4, h * 0.65 + l * 0.1);
+        this.coreContainer = this.add.container(384, 351);
+        this.particleContainer = this.add.container(384, 399);
+        this.ringContainer = this.add.container(384, 447);
         this.parts = [this.coreContainer, this.particleContainer, this.ringContainer];
         this.partRender.refreshCore(this.cores);
         this.partRender.refreshParticle(this.particles);

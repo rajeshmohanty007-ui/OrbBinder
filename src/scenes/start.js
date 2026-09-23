@@ -9,58 +9,56 @@ export default class StartScene extends Phaser.Scene {
     }
     rotateMsg() {
         this.add.text(
-            this.scale.width / 2,
-            this.scale.height / 2,
+            480,
+            270,
             'Rotate your device',
             { color: '#ffffffff' }
         ).setOrigin(0.5);
     }
     startUI() {
-        const l = this.scale.width;
-        const b = this.scale.height;
-        const startBG = this.add.image(l / 2, b / 2, 'bg');
+        const startBG = this.add.image(480, 270, 'bg');
         startBG.setOrigin(0.5);
-        startBG.setDisplaySize(l, b);
-        const shade = this.add.rectangle(l / 2, b / 2, l, b, 0x000000, 0.5);
+        startBG.setDisplaySize(960, 540);
+        const shade = this.add.rectangle(480, 270, 960, 540, 0x000000, 0.5);
         let start = this.add.image(
-            this.scale.width / 2,
-            this.scale.height / 2,
+            480,
+            270,
             'start'
         )
         start.setOrigin(0.5);
-        start.setDisplaySize(l * 0.2, b * 0.15)
+        start.setDisplaySize(192, 81)
         start.setInteractive({ useHandCursor: true });
         start.on('pointerdown', () => {
             this.scene.start('InitialGameScene');
         })
         let char = this.add.image(
-            l * 0.4,
-            b * 0.7,
+            384,
+            378,
             'char'
         );
         char.setOrigin(0.5);
-        char.setDisplaySize(l * 0.05, b * 0.1);
+        char.setDisplaySize(48, 54);
         let re = this.add.image(
-            l * 0.47,
-            b * 0.7,
+            451.2,
+            378,
             'resume'
         );
         re.setOrigin(0.5);
-        re.setDisplaySize(l * 0.05, b * 0.1);
+        re.setDisplaySize(48, 54);
         let set = this.add.image(
-            l * 0.54,
-            b * 0.7,
+            518.4,
+            378,
             'settings'
         );
         set.setOrigin(0.5);
-        set.setDisplaySize(l * 0.05, b * 0.1);
+        set.setDisplaySize(48, 54);
         let tr = this.add.image(
-            l * 0.61,
-            b * 0.7,
+            585.6,
+            378,
             'trophy'
         );
         tr.setOrigin(0.5);
-        tr.setDisplaySize(l * 0.05, b * 0.1);
+        tr.setDisplaySize(48, 54);
         this.linkBtn(char, 'char');
         this.linkBtn(set, 'set');
         this.linkBtn(re, 're');
@@ -90,8 +88,6 @@ export default class StartScene extends Phaser.Scene {
     }
     create() {
         this.registry.set('initialCoins', 40);
-        const l = this.scale.width;
-        const b = this.scale.height;
         if (this.isPortrait()) {
             this.rotateMsg();
         }
@@ -103,12 +99,12 @@ export default class StartScene extends Phaser.Scene {
         this.menu.setVisible(false);
 
 
-        const leaderBoardMenu = this.add.rectangle(l / 2, b / 2, l * 0.8, b * 0.8, 0x0319c3ff, 0.9);
-        const settingsMenu = this.add.rectangle(l / 2, b / 2, l * 0.8, b * 0.8, 0x0310c3ff, 0.9);
-        const resumeMenu = this.add.rectangle(l / 2, b / 2, l * 0.8, b * 0.8, 0x0319e3ff, 0.9);
-        const charactersMenu = this.add.rectangle(l / 2, b / 2, l * 0.8, b * 0.8, 0x0e19c3ff, 0.9);
+        const leaderBoardMenu = this.add.rectangle(480, 270, 768, 432, 0x0319c3ff, 0.9);
+        const settingsMenu = this.add.rectangle(480, 270, 768, 432, 0x0310c3ff, 0.9);
+        const resumeMenu = this.add.rectangle(480, 270, 768, 432, 0x0319e3ff, 0.9);
+        const charactersMenu = this.add.rectangle(480, 270, 768, 432, 0x0e19c3ff, 0.9);
         const closeBtn = this.add.image(50, 50, 'back');
-        closeBtn.setDisplaySize(l * 0.05, b * 0.1);
+        closeBtn.setDisplaySize(48, 54);
         closeBtn.setOrigin(0.5);
         closeBtn.setInteractive({ useHandCursor: true });
         closeBtn.on('pointerdown', () => {

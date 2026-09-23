@@ -2,6 +2,8 @@ import Phaser from "phaser";
 import Healthbar from "../../components/Healthbar";
 import SPbar from "../../components/Sheildbar";
 import InputManager from "../../controls/InputManager";
+import Particles from "../../vfx/Particles";
+
 export default class InitialGameScene extends Phaser.Scene {
     constructor() {
         super('InitialGameScene');
@@ -10,7 +12,13 @@ export default class InitialGameScene extends Phaser.Scene {
         this.load.image('dun-gr', '/src/assets/tiles/dun-ground.png');
         this.load.image('dun-bg', '/src/assets/tiles/bg2.png');
         this.load.spritesheet('hero', '/src/assets/sprites/warrior-sps.png', { frameWidth: 69, frameHeight: 44 });
-        this.load.spritesheet('creeper', '/src/assets/sprites/Creeper.png', { frameWidth: 64, frameHeight: 64 });
+        this.load.spritesheet('creeper', '/src/assets/sprites/creeper_sps.png', { frameWidth: 64, frameHeight: 64 });
+        this.load.image('sky', '/src/assets/tiles/sky.png');
+        this.load.spritesheet('ground', '/src/assets/tiles/OB_gr.png', { frameWidth: 64, frameHeight: 64 });
+        this.load.spritesheet('lamp', '/src/assets/sprites/lamp.png', { frameWidth: 16, frameHeight: 16 });
+        this.load.spritesheet('plant_top', '/src/assets/sprites/TallPlantTop.png', { frameWidth: 16, frameHeight: 8 });
+        this.load.spritesheet('plant_bot', '/src/assets/sprites/TallPlantBottom.png', { frameWidth: 16, frameHeight: 16 });
+        this.load.spritesheet('particles', '/src/assets/sprites/ParticlesSpritesheet.png', { frameWidth: 8, frameHeight: 8 });
     }
     animations() {
         this.anims.create({
@@ -31,30 +39,31 @@ export default class InitialGameScene extends Phaser.Scene {
             frameRate: 4,
             repeat: -1
         });
+        this.anims.create({
+            key: 'creeper-attack',
+            frames: this.anims.generateFrameNumbers('creeper', { start: 3, end: 11 }),
+            frameRate: 5,
+            repeat: 0
+        })
     }
     create() {
         // Initalisation
+        this.particles = new Particles(this);
         this.index = 0;
-        let l = this.scale.width;
-        let h = this.scale.height;
-        const worldWidth = l * 3;
-        const worldHeight = h;
+        const worldWidth = 2880;
+        const worldHeight = 540;
 
-        //BG Rendering
-        const grTileW = 96;
-        this.gameBG = this.add.group();
-        for (let i = 0; i < 30; i++) {
-            for (let j = 0; j < 5; j++) {
-                const tile = this.gameBG.create(i * grTileW, j * grTileW, 'dun-bg');
-                tile.setOrigin(0, 0);
-                tile.setDisplaySize(grTileW, grTileW);
-            }
-        }
-        this.gameBG.setAlpha(0.5);
+        //Sky Rendering
+        this.sky = this.add.image(0, 0, 'sky');
+        this.sky.setDisplaySize(960, 400);
+        this.sky.setDepth(0);
+        this.sky.setScrollFactor(0);
+        this.sky.setOrigin(0, 0);
 
         //Hero Rendering
         this.animations();
-        this.hero = this.physics.add.sprite(l * 0.1, h * 0.4, 'hero', 0);
+        this.hero = this.physics.add.sprite(96, 216, 'hero', 0);
+        this.hero.setDepth(10);
         this.hero.setScale(2);
         this.cameras.main.setRoundPixels(true);
         this.hero.play('idle');
@@ -66,22 +75,34 @@ export default class InitialGameScene extends Phaser.Scene {
 
         //Ground Rendering
         this.groundGroup = this.physics.add.staticGroup();
-        const cols = 30;
+        this.groundGroup.setDepth(2);
+        const cols = 40;
         const rows = 3;
+        for (let i = 0; i < cols; i++) {
+            const tile = this.groundGroup.create(i * 64, 360, 'ground', 0);
+            tile.setOrigin(0, 0);
+            tile.refreshBody();
+            tile.setSize(64, 52);
+            tile.setOffset(0, 12);
+        }
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < cols; j++) {
-                const tile = this.groundGroup.create(j * grTileW, h * 0.6 + i * grTileW, 'dun-gr');
+                const tile = this.groundGroup.create(j * 64, 424 + i * 64, 'ground', 2);
                 tile.setOrigin(0, 0);
-                tile.setDisplaySize(grTileW, grTileW);
                 tile.refreshBody();
             }
         }
         this.physics.add.collider(this.hero, this.groundGroup);
 
+        //Objects Rendering
+        this.objectsConstruct(this.index);
+        this.particles.AmbientParticles();
+
         //Enemy Rendering
-        this.enemy1 = this.physics.add.sprite(l * 2, h * 0.4, 'creeper');
+        this.enemy1 = this.physics.add.sprite(1920, 216, 'creeper');
         this.enemy1.play('creeper-idle');
         this.enemy1.setScale(2);
+        this.enemy1.setDepth(3);
         this.physics.add.collider(this.enemy1, this.groundGroup);
 
         //Launching UI
@@ -128,46 +149,66 @@ export default class InitialGameScene extends Phaser.Scene {
         this.pauseState = false;
     }
     reconstruction(index) {
-        this.physics.world.setBounds(this.scale.width * index, 0, this.scale.width * 3, this.scale.height);
-        this.cameras.main.setBounds(this.scale.width * index, 0, this.scale.width * 3, this.scale.height);
+        this.physics.world.setBounds(960 * index, 0, 2880, 540);
+        this.cameras.main.setBounds(960 * index, 0, 2880, 540);
 
         this.groundGroup.clear(true, true);
-        this.gameBG.clear(true, true);
 
-        const l = this.scale.width;
-        const h = this.scale.height;
-        const cols = 30;
+        const cols = 40;
         const rows = 3;
-        const grTileW = this.scale.width * 0.1;
-        for (let i = 0; i < 30; i++) {
-            for (let j = 0; j < 5; j++) {
-                const tile = this.gameBG.create(this.scale.width * index + i * grTileW, j * grTileW, 'dun-bg');
-                tile.setOrigin(0, 0);
-                tile.setDisplaySize(grTileW, grTileW);
-            }
-        }
-        this.gameBG.setAlpha(0.5);
+        const grTileW = 64;
 
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < cols; j++) {
-                const tile = this.groundGroup.create(this.scale.width * index + j * grTileW, this.scale.height * 0.6 + i * grTileW, 'dun-gr');
+                const tile = this.groundGroup.create(960 * index + j * grTileW, 360 + i * grTileW, 'ground', i == 0 ? 0 : 2);
                 tile.setOrigin(0, 0);
-                tile.setDisplaySize(grTileW, grTileW);
                 tile.refreshBody();
+                if (i == 0) {
+                    tile.setSize(64, 52);
+                    tile.setOffset(0, 12);
+                } else {
+                    tile.setSize(64, 64);
+                    tile.setOffset(0, 0);
+                }
             }
         }
         this.hero.setDepth(10);
 
-        this.enemy1 = this.physics.add.sprite(l * (2 + index), h * 0.4, 'creeper');
+        this.enemy1 = this.physics.add.sprite(960 * (2 + index), 216, 'creeper');
         this.enemy1.play('creeper-idle');
         this.enemy1.setScale(2);
         this.physics.add.collider(this.enemy1, this.groundGroup);
+        this.enemy1.setDepth(3);
+
+        this.objectsConstruct(index);
+
+    }
+    objectsConstruct(index) {
+        this.physics.world.setBounds(960 * index, 0, 2880, 540);
+        this.cameras.main.setBounds(960 * index, 0, 2880, 540);
+        let n = 0;
+
+        for (let i = 1; n < 2000; i++) {
+            n += Math.floor(Math.random() * 500 + 10);
+
+            const plant = this.add.image(960 * index + n, 316, 'plant_top');
+            plant.setOrigin(0, 0);
+            plant.setScale(2);
+            plant.setDepth(1);
+
+            const plantBot = this.add.image(960 * index + n, 332, 'plant_bot');
+            plantBot.setOrigin(0, 0);
+            plantBot.setScale(2);
+            plantBot.setDepth(1);
+
+        }
+
 
     }
     update() {
         if (this.enemy1.active) {
             const distance = Phaser.Math.Distance.Between(this.hero.x, this.hero.y, this.enemy1.x, this.enemy1.y);
-            if (distance < this.scale.width * 0.6 && !this.camShotRunning) {
+            if (distance < 576 && !this.camShotRunning) {
                 this.hero.setVelocityX(0);
                 this.hero.play('idle');
                 this.heroState = 'idle';
@@ -185,7 +226,7 @@ export default class InitialGameScene extends Phaser.Scene {
                 this.hero.play('sprint-right', true);
                 this.heroState = 'runR';
             }
-            this.hero.setVelocityX(900);
+            this.hero.setVelocityX(300);
         }
         else if (this.controls.isMovingLeft) {
             if (this.heroState !== 'runL') {

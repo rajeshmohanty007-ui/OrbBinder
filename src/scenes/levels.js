@@ -6,19 +6,16 @@ export default class LevelsScene extends Phaser.Scene {
     }
 
     create() {
-        const l = this.scale.width;
-        const b = this.scale.height;
-
         // Background image (loaded in StartScene)
-        const bg = this.add.image(l / 2, b / 2, 'bg');
+        const bg = this.add.image(480, 270, 'bg');
         bg.setOrigin(0.5);
-        bg.setDisplaySize(l, b);
+        bg.setDisplaySize(960, 540);
 
         // Dark overlay for readability
-        const shade = this.add.rectangle(l / 2, b / 2, l, b, 0x000000, 0.6);
+        const shade = this.add.rectangle(480, 270, 960, 540, 0x000000, 0.6);
 
         // Title
-        const title = this.add.text(l / 2, b * 0.15, 'SELECT LEVEL', {
+        const title = this.add.text(480, 81, 'SELECT LEVEL', {
             fontFamily: 'Arial',
             fontSize: '42px',
             fontWeight: 'bold',
@@ -28,7 +25,7 @@ export default class LevelsScene extends Phaser.Scene {
 
         // Back Button
         const backBtn = this.add.image(60, 60, 'back');
-        backBtn.setDisplaySize(l * 0.05, b * 0.1);
+        backBtn.setDisplaySize(48, 54);
         backBtn.setOrigin(0.5);
         backBtn.setInteractive({ useHandCursor: true });
         backBtn.on('pointerdown', () => {
@@ -43,8 +40,8 @@ export default class LevelsScene extends Phaser.Scene {
 
         // 2x5 Grid for Levels 1 to 10
         const cols = 5;
-        const startX = l / 2 - (2 * 140); // Centering the 5 columns (step = 140)
-        const startY = b * 0.45;
+        const startX = 200; // Centering the 5 columns (step = 140, 480 - 2 * 140)
+        const startY = 243;
         const stepX = 140;
         const stepY = 140;
 

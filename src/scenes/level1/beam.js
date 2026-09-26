@@ -3,7 +3,6 @@ import Calc from "../../data/logics/damageCalculator";
 import status from "../../data/logics/status";
 import { coinMapping } from "../../data/coinMapping";
 import { delay } from "../../utils/delay";
-import { registerBeamAnimations } from "../../Animations/BeamAnimation";
 import SelectionSystem from "../../systems/SelectionSytem";
 import { loadData } from "../../data/coinMapping";
 import Shop from "../../components/Shop";
@@ -20,14 +19,11 @@ export default class BeamScene extends Phaser.Scene {
     preload() {
         this.load.spritesheet('ringUI', '/src/assets/UI/Rings.png', { frameWidth: 64, frameHeight: 64 });
         this.load.image('highlighter', '/src/assets/UI/highlighter.png');
-        this.load.spritesheet('pyroSrt', '/src/assets/sprites/pyroStart.png', { frameWidth: 64, frameHeight: 64 });
-        this.load.spritesheet('pyroMid', '/src/assets/sprites/pyroMid.png', { frameWidth: 64, frameHeight: 64 });
-        this.load.spritesheet('pyroEnd', '/src/assets/sprites/pyroEnd.png', { frameWidth: 64, frameHeight: 64 });
+
         this.load.image('beamMaker', '/src/assets/UI/BeamMaker.png');
         this.load.image('refreshBtn', '/src/assets/UI/RefreshBtn.png');
         this.load.atlas('beamSheet', '/src/assets/UI/beamSheet.png', '/src/assets/UI/beamSheet.json');
         this.load.json('db', '/src/data/db.json');
-        this.load.spritesheet('AoE', '/src/assets/UI/AoE.png', { frameWidth: 64, frameHeight: 64 });
     }
     async coinLoad() {
         this.coinMap = await coinMapping();
@@ -37,10 +33,6 @@ export default class BeamScene extends Phaser.Scene {
         Object.keys(this.beam).forEach(key => this.beam[key] = null);
         this.beamAnimationRunning = false;
         this.midContainer.removeAll(true);
-        this.partRender.refreshCore(this.cores);
-        this.partRender.refreshParticle(this.particles);
-        this.partRender.refreshRing();
-        this.shop.hideShop();
     }
     async damageHandler() {
         let damage = await Calc(this.beam.core, this.beam.particle, this.beam.ring);
@@ -55,43 +47,17 @@ export default class BeamScene extends Phaser.Scene {
     }
 
     async beamAnimation() {
+        this.beamAnimationRunning = true;
         const InitialGameScene = this.scene.get('InitialGameScene');
         if (!InitialGameScene) return;
-        const cam = InitialGameScene.cameras.main;
 
-        const heroPos = this.registry.get('hero-position');
-        if (!heroPos) return;
-
-        const screenX = (heroPos.x - cam.scrollX) * cam.zoom;
-        const screenY = (heroPos.y - cam.scrollY) * cam.zoom;
-
-        const beamContainer = this.add.container();
-
-        const beamS = this.add.sprite(screenX + 10, screenY - 10, 'pyroSrt');
-        beamS.setOrigin(0, 0);
-        beamS.setScale(0.5);
-        beamS.play('startBeam1-init');
-        beamContainer.add(beamS);
-
-        await delay(1000);
-        beamS.play('startBeam1-rep');
-        for (let i = 0; i < 20; i++) {
-            const el = this.add.sprite(beamS.x + 32 * (i + 1), beamS.y, 'pyroMid');
-            el.setOrigin(0, 0);
-            el.setScale(0.5);
-            el.play('midBeam1');
-            beamContainer.add(el);
-        }
-        const beamE = this.add.sprite(beamS.x + 32 * 21, beamS.y, 'pyroEnd');
-        beamE.setOrigin(0, 0);
-        beamE.setScale(0.5);
-        beamE.play('endBeam1');
-        beamContainer.add(beamE);
+        InitialGameScene.beamFire();
 
         await this.damageHandler();
 
-        await delay(4000);
-        beamContainer.destroy(true);
+        await delay(2000);
+
+        InitialGameScene.clearBeam();
         this.clearBeam()
 
         if (this.enemyStatus.health <= 0) {
@@ -103,6 +69,9 @@ export default class BeamScene extends Phaser.Scene {
             }
             this.events.emit('scene-over', this.coinCount);
             this.scene.stop('BeamScene');
+        }
+        else {
+            this.events.emit('Enemy-turn');
         }
 
     }
@@ -117,8 +86,6 @@ export default class BeamScene extends Phaser.Scene {
         this.shop = new Shop(this);
         this.messageSystem = new MessageSystem(this);
         this.textBubbleVfx = new TextBubbleVfx(this);
-
-        if (!this.anims.exists('startBeam1-init')) registerBeamAnimations(this);
 
         this.events.emit('enemy-arrived', {
             maxHP: 300,

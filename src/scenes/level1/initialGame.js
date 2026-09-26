@@ -3,6 +3,9 @@ import Healthbar from "../../components/Healthbar";
 import SPbar from "../../components/Sheildbar";
 import InputManager from "../../controls/InputManager";
 import Particles from "../../vfx/Particles";
+import EnemyReact from "./EnemyReact";
+import { delay } from "../../utils/delay";
+import { registerBeamAnimations } from "../../Animations/BeamAnimation";
 
 export default class InitialGameScene extends Phaser.Scene {
     constructor() {
@@ -19,6 +22,38 @@ export default class InitialGameScene extends Phaser.Scene {
         this.load.spritesheet('plant_top', '/src/assets/sprites/TallPlantTop.png', { frameWidth: 16, frameHeight: 8 });
         this.load.spritesheet('plant_bot', '/src/assets/sprites/TallPlantBottom.png', { frameWidth: 16, frameHeight: 16 });
         this.load.spritesheet('particles', '/src/assets/sprites/ParticlesSpritesheet.png', { frameWidth: 8, frameHeight: 8 });
+        this.load.spritesheet('pyroSrt', '/src/assets/sprites/pyroStart.png', { frameWidth: 64, frameHeight: 64 });
+        this.load.spritesheet('pyroMid', '/src/assets/sprites/pyroMid.png', { frameWidth: 64, frameHeight: 64 });
+        this.load.spritesheet('pyroEnd', '/src/assets/sprites/pyroEnd.png', { frameWidth: 64, frameHeight: 64 });
+    }
+    async beamFire() {
+
+        this.beamContainer = this.add.container();
+        this.beamContainer.setDepth(12);
+
+        const beamS = this.add.sprite(this.hero.x, this.hero.y - 10, 'pyroSrt');
+        beamS.setOrigin(0, 0);
+        beamS.setScale(0.5);
+        beamS.play('startBeam1-init');
+        this.beamContainer.add(beamS);
+
+        await delay(1000);
+        beamS.play('startBeam1-rep');
+        for (let i = 0; i < 20; i++) {
+            const el = this.add.sprite(beamS.x + 32 * (i + 1), beamS.y, 'pyroMid');
+            el.setOrigin(0, 0);
+            el.setScale(0.5);
+            el.play('midBeam1');
+            this.beamContainer.add(el);
+        }
+        const beamE = this.add.sprite(beamS.x + 32 * 21, beamS.y, 'pyroEnd');
+        beamE.setOrigin(0, 0);
+        beamE.setScale(0.5);
+        beamE.play('endBeam1');
+        this.beamContainer.add(beamE);
+    }
+    clearBeam() {
+        this.beamContainer.destroy(true);
     }
     animations() {
         this.anims.create({
@@ -45,6 +80,7 @@ export default class InitialGameScene extends Phaser.Scene {
             frameRate: 5,
             repeat: 0
         })
+        registerBeamAnimations(this);
     }
     create() {
         // Initalisation
@@ -114,6 +150,7 @@ export default class InitialGameScene extends Phaser.Scene {
         this.cameras.main.setBounds(0, 0, worldWidth, worldHeight);
         this.cameras.main.startFollow(this.hero, true, 0.08, 0.08);
 
+        //Beam Scene Events
         this.pauseState = false;
         this.camShotRunning = false;
         this.controls = new InputManager(this);
@@ -124,6 +161,24 @@ export default class InitialGameScene extends Phaser.Scene {
             this.reconstruction(this.index);
             this.resetCamera();
         })
+        this.enemyReact = new EnemyReact(this);
+        BeamScene.events.on('Enemy-turn', () => {
+            if (!this.enemy1.active) {
+                this.scene.sleep('BeamScene');
+                return;
+            }
+            this.scene.sleep('BeamScene');
+            this.enemyReact.Attack(this.enemy1);
+        })
+        this.events.on('enemy-attack-over', () => {
+            if (!this.enemy1.active) return;
+            this.scene.wake('BeamScene');
+            const beamscene = this.scene.get('BeamScene');
+            beamscene.partRender.refresh();
+
+        })
+
+
     }
     camShot(player, enemy) {
         const cam = this.cameras.main;
@@ -226,7 +281,7 @@ export default class InitialGameScene extends Phaser.Scene {
                 this.hero.play('sprint-right', true);
                 this.heroState = 'runR';
             }
-            this.hero.setVelocityX(300);
+            this.hero.setVelocityX(900);
         }
         else if (this.controls.isMovingLeft) {
             if (this.heroState !== 'runL') {

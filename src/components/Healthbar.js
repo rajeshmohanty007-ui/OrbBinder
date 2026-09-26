@@ -25,13 +25,13 @@ export default class Healthbar {
         this.graphics.lineStyle(2, 0xffffff);
         this.graphics.strokeRect(this.x, this.y, this.width, this.height);
     }
-    setHP(value) {
+    setHP(value, duration = 1900) {
         const newHP = Phaser.Math.Clamp(value, 0, this.maxHP);
 
         this.scene.tweens.add({
             targets: this,
             currentHP: newHP,
-            duration: 3900,
+            duration: duration,
             onUpdate: () => {
                 this.draw();
             }
@@ -43,13 +43,13 @@ export default class Healthbar {
         this.scene.tweens.add({
             targets: this,
             currentHP: newHP,
-            duration: 4000,
+            duration: 1900,
             onUpdate: () => {
                 this.draw();
             }
         })
     }
-    destroy(){
+    destroy() {
         this.graphics.clear();
     }
 }

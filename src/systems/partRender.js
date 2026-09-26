@@ -55,5 +55,10 @@ export default class PartRender {
             this.scene.ringContainer.add(el);
         }
     }
+    refresh() {
+        this.refreshCore(this.scene.cores);
+        this.refreshParticle(this.scene.particles);
+        this.refreshRing();
+    }
 
 }

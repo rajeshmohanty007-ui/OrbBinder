@@ -24,12 +24,12 @@ export default class SPbar {
         this.graphics.lineStyle(2, 0xffffff);
         this.graphics.strokeRect(this.x, this.y, this.width, this.height);
     }
-    setSP(value) {
+    setSP(value, duration = 1900) {
         const newSP = Phaser.Math.Clamp(value, 0, this.maxSP);
         this.scene.tweens.add({
             targets: this,
             currentSP: newSP,
-            duration: 3900,
+            duration: duration,
             onUpdate: () => {
                 this.draw();
             }

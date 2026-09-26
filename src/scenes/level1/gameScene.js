@@ -7,9 +7,9 @@ import EnemyReact from "./EnemyReact";
 import { delay } from "../../utils/delay";
 import { registerBeamAnimations } from "../../Animations/BeamAnimation";
 
-export default class InitialGameScene extends Phaser.Scene {
+export default class GameScene extends Phaser.Scene {
     constructor() {
-        super('InitialGameScene');
+        super('GameScene');
     }
     preload() {
         this.load.image('dun-gr', '/src/assets/tiles/dun-ground.png');

@@ -95,11 +95,11 @@ export default class Shop {
             ring: [76, 72]
         }
         if (this.scene.beam[type]) {
-            this.scene.textBubbleVfx.showText("Already Selected " + type, 790, 454, 1000, "arial", "32px", null, "#ff0000");
+            this.scene.textBubbleVfx.showText("Already Selected " + type, 790, 454, 1000, "arial", "24px", "#000", "#ff0000");
             return;
         }
         else if (this.scene.coinMap[name] >= this.scene.coinCount) {
-            this.scene.textBubbleVfx.showText("Not Enough Money", 790, 454, 1000, "arial", "32px", null, "#ff0000");
+            this.scene.textBubbleVfx.showText("Not Enough Money", 790, 454, 1000, "arial", "24px", "#000", "#ff0000");
             return;
         }
         else {

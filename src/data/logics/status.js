@@ -82,5 +82,4 @@ export default async function status(hero, enemy, core, particle) {
     applyEffects(hero, "hero", particle1?.effect);
     applyEffects(enemy, "enemy", core1?.effect);
     applyEffects(enemy, "enemy", particle1?.effect);
-
 }

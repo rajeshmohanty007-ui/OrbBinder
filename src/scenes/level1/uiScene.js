@@ -6,6 +6,7 @@ import status from "../../data/logics/status";
 import InputManager from "../../controls/InputManager";
 import counter from "../../components/counter";
 import { delay } from "../../utils/delay";
+import StatusSystem from "../../systems/statusSystem";
 
 export default class uiScene extends Phaser.Scene {
     constructor() {
@@ -37,6 +38,10 @@ export default class uiScene extends Phaser.Scene {
         this.hpcounter = new counter(this, 50, 120, "HP", 100);
         this.spBar = new SPbar(this, 50, 160, 120, 10, 100);
         this.spcounter = new counter(this, 50, 135, "SP", 100);
+        this.playerStatusBox = this.add.container(50, 120);
+        this.enemyStatusBox = this.add.container(672, 110);
+
+        this.statusSystem = new StatusSystem(this);
 
         // Pause Button
         this.pause = this.add.image(38.4, 38.4, 'pauseCoin', 0);
@@ -44,7 +49,7 @@ export default class uiScene extends Phaser.Scene {
         this.pause.setDisplaySize(38.4, 38.4);
         this.pause.setInteractive({ useHandCursor: true });
         this.pause.on('pointerdown', () => {
-            this.scene.pause('InitialGameScene');
+            this.scene.pause('GameScene');
             this.scene.pause('BeamScene');
             this.scene.pause('uiScene');
             this.scene.launch('PauseScene');
@@ -80,6 +85,8 @@ export default class uiScene extends Phaser.Scene {
 
             this.enemyHpCounter.setValue(enemy.health, 1000);
             this.enemySpCounter.setValue(enemy.shield, 1000);
+            this.statusSystem.updateEnemyStatus(enemy.status);
+            this.statusSystem.updatePlayerStatus(this.playerStatus.status);
         });
 
         BeamScene.events.on('scene-over', (coins) => {
@@ -89,19 +96,23 @@ export default class uiScene extends Phaser.Scene {
             this.EspBar.destroy();
             this.enemyHpCounter.destroy();
             this.enemySpCounter.destroy();
+            this.statusSystem.updateEnemyStatus([]);
+            this.statusSystem.updatePlayerStatus(this.playerStatus.status);
         })
         BeamScene.events.on('core_selected', coins => { this.coinCount = coins; this.coinText.setText(this.coinCount) });
         BeamScene.events.on('particle_selected', coins => { this.coinCount = coins; this.coinText.setText(this.coinCount) });
         BeamScene.events.on('ring_selected', coins => { this.coinCount = coins; this.coinText.setText(this.coinCount) });
 
-        const InitialGameScene = this.scene.get('InitialGameScene');
-        InitialGameScene.events.on('enemy-attack', (damage) => {
+        const GameScene = this.scene.get('GameScene');
+        GameScene.events.on('enemy-attack', (damage) => {
             this.playerStatus.health = Math.max(0, this.playerStatus.health - damage.health);
             this.playerStatus.shield = Math.max(0, this.playerStatus.shield - damage.shield);
             this.hpBar.setHP(this.playerStatus.health, 1900);
             this.spBar.setSP(this.playerStatus.shield, 1900);
             this.hpcounter.setValue(this.playerStatus.health, 1900);
             this.spcounter.setValue(this.playerStatus.shield, 1900);
+            this.statusSystem.updatePlayerStatus(this.playerStatus.status);
+            this.statusSystem.updateEnemyStatus(this.enemyStatus.status);
         })
     }
     update() {

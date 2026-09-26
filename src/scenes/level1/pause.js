@@ -21,14 +21,14 @@ export default class PauseScene extends Phaser.Scene {
         resume.setScrollFactor(0);
         exit.setScrollFactor(0);
         resume.on('pointerdown', () => {
-            this.scene.resume('InitialGameScene');
+            this.scene.resume('GameScene');
             this.scene.resume('BeamScene');
             this.scene.resume('uiScene');
             this.scene.stop('PauseScene');
         });
         exit.on('pointerdown', () => {
             this.scene.stop('BeamScene');
-            this.scene.stop('InitialGameScene');
+            this.scene.stop('GameScene');
             this.scene.stop('uiScene');
             this.scene.start('StartScene');
         })

@@ -29,7 +29,7 @@ export default class StartScene extends Phaser.Scene {
         start.setDisplaySize(192, 81)
         start.setInteractive({ useHandCursor: true });
         start.on('pointerdown', () => {
-            this.scene.start('InitialGameScene');
+            this.scene.start('GameScene');
         })
         let char = this.add.image(
             384,

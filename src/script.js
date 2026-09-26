@@ -1,6 +1,6 @@
 import StartScene from "./scenes/start.js"
 import LevelsScene from "./scenes/levels.js";
-import InitialGameScene from "./scenes/level1/initialGame.js";
+import GameScene from "./scenes/level1/gameScene.js";
 import Level2Scene from "./scenes/level2/level2Scene.js";
 import Transition from "./scenes/level1/transition.js";
 import BeamScene from "./scenes/level1/beam.js";
@@ -26,7 +26,7 @@ const config = {
     scene: [
         StartScene,
         LevelsScene,
-        InitialGameScene,
+        GameScene,
         Level2Scene,
         uiScene,
         Transition,

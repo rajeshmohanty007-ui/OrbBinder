@@ -56,7 +56,7 @@ export default class LevelsScene extends Phaser.Scene {
             // Level Button Container
             const btnBg = this.add.rectangle(x, y, 100, 100, isUnlocked ? 0x1a2b5c : 0x2c2c2c, 0.9);
             btnBg.setStrokeStyle(3, isUnlocked ? 0xffd700 : 0x777777);
-            
+
             const btnText = this.add.text(x, y, i.toString(), {
                 fontFamily: 'Arial',
                 fontSize: '32px',
@@ -67,10 +67,10 @@ export default class LevelsScene extends Phaser.Scene {
             if (isUnlocked) {
                 // Interactivity for unlocked levels
                 btnBg.setInteractive({ useHandCursor: true });
-                
+
                 btnBg.on('pointerdown', () => {
                     if (i === 1) {
-                        this.scene.start('InitialGameScene');
+                        this.scene.start('GameScene');
                     } else if (i === 2) {
                         this.scene.start('Level2Scene');
                     }

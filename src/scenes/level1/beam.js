@@ -48,20 +48,20 @@ export default class BeamScene extends Phaser.Scene {
 
     async beamAnimation() {
         this.beamAnimationRunning = true;
-        const InitialGameScene = this.scene.get('InitialGameScene');
-        if (!InitialGameScene) return;
+        const GameScene = this.scene.get('GameScene');
+        if (!GameScene) return;
 
-        InitialGameScene.beamFire();
+        GameScene.beamFire();
 
         await this.damageHandler();
 
         await delay(2000);
 
-        InitialGameScene.clearBeam();
+        GameScene.clearBeam();
         this.clearBeam()
 
         if (this.enemyStatus.health <= 0) {
-            const gameScene = this.scene.get('InitialGameScene');
+            const gameScene = this.scene.get('GameScene');
             gameScene.enemy1.destroy();
             this.coinCount += 60;
             if (this.coinCount >= 100) {
